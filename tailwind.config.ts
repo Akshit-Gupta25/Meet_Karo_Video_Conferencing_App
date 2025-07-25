@@ -19,6 +19,8 @@ const config = {
     },
     extend: {
       colors: {
+        cream: '#FEFBF6',
+        almond: '#F3E5D8',
         dark: {
           1: '#1C1F2E',
           2: '#161925',

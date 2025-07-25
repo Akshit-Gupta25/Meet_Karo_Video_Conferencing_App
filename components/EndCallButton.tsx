@@ -1,13 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
-
-import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
+import { Button } from './ui/button';
+import LeaveConfirmationModal from './LeaveConfirmationModal';
 
 const EndCallButton = () => {
   const call = useCall();
   const router = useRouter();
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   if (!call)
     throw new Error(
@@ -25,15 +27,34 @@ const EndCallButton = () => {
 
   if (!isMeetingOwner) return null;
 
-  const endCall = async () => {
-    await call.endCall();
-    router.push('/');
+  const handleEndCall = () => {
+    setShowConfirmation(true);
+  };
+
+  const confirmEndCall = async () => {
+    try {
+      await call.endCall();
+      router.push('/');
+    } catch (error) {
+      console.error('Error ending call:', error);
+      router.push('/');
+    } finally {
+      setShowConfirmation(false);
+    }
   };
 
   return (
-    <Button onClick={endCall} className="bg-red-500">
-      End call for everyone
-    </Button>
+    <>
+      <Button onClick={handleEndCall} className="bg-red-500 hover:bg-red-600">
+        End call for everyone
+      </Button>
+      <LeaveConfirmationModal
+        isOpen={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        onConfirm={confirmEndCall}
+        isEndingForAll={true}
+      />
+    </>
   );
 };
 

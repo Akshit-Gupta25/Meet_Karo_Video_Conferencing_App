@@ -59,6 +59,22 @@ const MeetingSetup = ({
       />
     );
 
+  const [isJoining, setIsJoining] = useState(false);
+
+  const handleJoinMeeting = async () => {
+    setIsJoining(true);
+    try {
+      console.log('Attempting to join call...');
+      await call.join();
+      console.log('Successfully joined call');
+      setIsSetupComplete(true);
+    } catch (error) {
+      console.error('Error joining call:', error);
+      setIsJoining(false);
+      // You could show an error message here
+    }
+  };
+
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center gap-3 text-white">
       <h1 className="text-center text-2xl font-bold">Setup</h1>
@@ -76,13 +92,10 @@ const MeetingSetup = ({
       </div>
       <Button
         className="rounded-md bg-green-500 px-4 py-2.5"
-        onClick={() => {
-          call.join();
-
-          setIsSetupComplete(true);
-        }}
+        onClick={handleJoinMeeting}
+        disabled={isJoining}
       >
-        Join meeting
+        {isJoining ? 'Joining...' : 'Join meeting'}
       </Button>
     </div>
   );

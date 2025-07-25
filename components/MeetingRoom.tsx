@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   CallControls,
   CallParticipantsList,
@@ -10,7 +10,7 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Users, LayoutList } from 'lucide-react';
+import { Users, LayoutList, Info } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -21,6 +21,7 @@ import {
 } from './ui/dropdown-menu';
 import Loader from './Loader';
 import EndCallButton from './EndCallButton';
+import MeetingInfoModal from './MeetingInfoModal';
 import { cn } from '@/lib/utils';
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
@@ -31,10 +32,36 @@ const MeetingRoom = () => {
   const router = useRouter();
   const [layout, setLayout] = useState<CallLayoutType>('speaker-left');
   const [showParticipants, setShowParticipants] = useState(false);
+  const [showMeetingInfo, setShowMeetingInfo] = useState(false);
+  const [meetingUrl, setMeetingUrl] = useState('');
+  const [hasAutoShown, setHasAutoShown] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
-
+  
+  // Get meeting ID from the URL
+  const meetingId = searchParams.get('id') || 'unknown';
+  
   // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
   const callingState = useCallCallingState();
+  
+  // Set meeting URL on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setMeetingUrl(window.location.href);
+    }
+  }, []);
+  
+  // Show modal automatically when joining the meeting (only once)
+  useEffect(() => {
+    if (callingState === CallingState.JOINED && !hasAutoShown && !showMeetingInfo) {
+      // Add a small delay to ensure everything is loaded
+      const timer = setTimeout(() => {
+        setShowMeetingInfo(true);
+        setHasAutoShown(true);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [callingState, hasAutoShown, showMeetingInfo]);
 
   if (callingState !== CallingState.JOINED) return <Loader />;
 
@@ -65,7 +92,7 @@ const MeetingRoom = () => {
       </div>
       {/* video layout and call controls */}
       <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
-        <CallControls onLeave={() => router.push(`/`)} />
+        <CallControls onLeave={() => router.push('/')} />
 
         <DropdownMenu>
           <div className="flex items-center">
@@ -94,8 +121,23 @@ const MeetingRoom = () => {
             <Users size={20} className="text-white" />
           </div>
         </button>
+        
+        <button onClick={() => setShowMeetingInfo(true)}>
+          <div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
+            <Info size={20} className="text-white" />
+          </div>
+        </button>
+        
         {!isPersonalRoom && <EndCallButton />}
       </div>
+      
+      {/* Meeting Info Modal */}
+      <MeetingInfoModal
+        isOpen={showMeetingInfo}
+        onClose={() => setShowMeetingInfo(false)}
+        meetingId={meetingId}
+        meetingUrl={meetingUrl}
+      />
     </section>
   );
 };

@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
+import { useUser } from '@clerk/nextjs';
 
 export const useGetCallById = (id: string | string[]) => {
   const [call, setCall] = useState<Call>();
   const [isCallLoading, setIsCallLoading] = useState(true);
 
   const client = useStreamVideoClient();
+  const { user } = useUser();
 
   useEffect(() => {
-    if (!client) return;
+    if (!client || !user) return;
     
     const loadCall = async () => {
       try {
@@ -27,11 +29,7 @@ export const useGetCallById = (id: string | string[]) => {
           // Create a new call if none exists
           console.log('No existing call found, creating new call');
           const newCall = client.call('default', callId);
-          await newCall.create({
-            data: {
-              created_by_id: client.user?.id,
-            },
-          });
+          await newCall.create();
           console.log('Created new call:', newCall);
           setCall(newCall);
         }
@@ -44,7 +42,7 @@ export const useGetCallById = (id: string | string[]) => {
     };
 
     loadCall();
-  }, [client, id]);
+  }, [client, id, user]);
 
   return { call, isCallLoading };
 };

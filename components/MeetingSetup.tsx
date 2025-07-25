@@ -24,15 +24,16 @@ const MeetingSetup = ({
   const callHasEnded = !!callEndedAt;
 
   const call = useCall();
+  
+  // https://getstream.io/video/docs/react/ui-cookbook/replacing-call-controls/
+  const [isMicCamToggled, setIsMicCamToggled] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   if (!call) {
     throw new Error(
       'useStreamCall must be used within a StreamCall component.',
     );
   }
-
-  // https://getstream.io/video/docs/react/ui-cookbook/replacing-call-controls/
-  const [isMicCamToggled, setIsMicCamToggled] = useState(false);
 
   useEffect(() => {
     if (isMicCamToggled) {
@@ -58,8 +59,6 @@ const MeetingSetup = ({
         iconUrl="/icons/call-ended.svg"
       />
     );
-
-  const [isJoining, setIsJoining] = useState(false);
 
   const handleJoinMeeting = async () => {
     setIsJoining(true);

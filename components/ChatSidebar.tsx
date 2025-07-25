@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { StreamChat } from 'stream-chat';
-import { Chat, Channel, MessageList, MessageInput, Window } from 'stream-chat-react';
+// Stream Chat components are commented out for future implementation
 import { X, MessageCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';

@@ -3,8 +3,7 @@ import { useState } from "react";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Copy, Share2, UserPlus, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Copy, UserPlus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface MeetingInfoModalProps {
@@ -88,7 +87,7 @@ const MeetingInfoModal = ({
         <div className="relative px-6 py-5 border-b border-[#252A41] flex-shrink-0">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-white">
-              Your meeting's ready
+              Your meeting&apos;s ready
             </h2>
             <button
               onClick={onClose}
